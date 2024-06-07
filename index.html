@@ -3,6 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="icon" href="icon.png" type="image/png" />
         <title>Neary - Meeting Point Finder</title>
         <link
             rel="stylesheet"
@@ -127,9 +128,7 @@
                 </button>
             </div>
             <div id="inputContainer"></div>
-            <button class="btn" onclick="showOnMap()">
-                Show on Map
-            </button>
+            <button class="btn" onclick="showOnMap()">Show on Map</button>
             <input
                 type="text"
                 id="meetingPointAddress"
@@ -216,7 +215,9 @@
                                         icon: centralIcon,
                                     })
                                         .addTo(map)
-                                        .bindPopup("Meeting Point: " + displayAddress)
+                                        .bindPopup(
+                                            "Meeting Point: " + displayAddress
+                                        )
                                         .openPopup();
                                     map.setView([nearestLat, nearestLon], 13);
 
