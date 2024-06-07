@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <link
+            rel="stylesheet"
+            href="https://unpkg.com/leaflet/dist/leaflet.css"
+        />
+    </head>
+    <body>
+        <input type="number" id="numUsers" placeholder="Numero di utenti" />
+        <button onclick="generateInputs()">Genera campi di input</button>
+        <div id="inputContainer"></div>
+        <button onclick="showOnMap()">Mostra sulla mappa</button>
+        <div id="mapid" style="height: 800px"></div>
+
+        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+        <script src="script.js"></script>
+    </body>
+</html>
