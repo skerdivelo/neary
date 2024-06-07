@@ -11,4 +11,4 @@ This project is a web application that helps multiple users find a convenient me
 
 ## Open Source and Attribution
 
-This project is open source under the [MIT License](LICENSE). You are free to use and modify the code for your own purposes. However, if you use this project or its codebase in your own work, please provide attribution by linking back to this repository or mentioning the original author, [Your Name], and a link to this GitHub repository.
+This project is open source under the [MIT License](LICENSE). You are free to use and modify the code for your own purposes. However, if you use this project or its codebase in your own work, please provide attribution by linking back to this repository or mentioning the original author, Skerdi Velo, and a link to this GitHub repository.
