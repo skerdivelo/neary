@@ -3,20 +3,231 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Document</title>
+        <title>Neary - Meeting Point Finder</title>
         <link
             rel="stylesheet"
             href="https://unpkg.com/leaflet/dist/leaflet.css"
         />
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: "Arial", sans-serif;
+            }
+
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                background: #f7f7f7;
+            }
+
+            .container {
+                width: 90%;
+                max-width: 1200px;
+                margin: auto;
+                padding: 20px;
+                background: #fff;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                border-radius: 8px;
+            }
+
+            .header {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+
+            .header h1 {
+                margin-bottom: 10px;
+                font-size: 24px;
+                color: #333;
+            }
+
+            .header input[type="number"] {
+                width: 50%;
+                padding: 10px;
+                margin: 10px 0;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                font-size: 16px;
+            }
+
+            #inputContainer {
+                margin-bottom: 20px;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            #inputContainer input {
+                flex: 1;
+                min-width: 200px;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                font-size: 16px;
+            }
+
+            .btn {
+                display: inline-block;
+                padding: 10px 20px;
+                margin: 10px 0;
+                background: #007bff;
+                color: #fff;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: background 0.3s;
+            }
+
+            .btn:hover {
+                background: #0056b3;
+            }
+
+            #mapid {
+                height: 600px;
+                border: 1px solid #ccc;
+                border-radius: 8px;
+            }
+
+            @media (max-width: 768px) {
+                .header input[type="number"] {
+                    width: 100%;
+                }
+
+                #inputContainer input {
+                    min-width: 100%;
+                }
+            }
+        </style>
     </head>
     <body>
-        <input type="number" id="numUsers" placeholder="Numero di utenti" />
-        <button onclick="generateInputs()">Genera campi di input</button>
-        <div id="inputContainer"></div>
-        <button onclick="showOnMap()">Mostra sulla mappa</button>
-        <div id="mapid" style="height: 800px"></div>
-
+        <div class="container">
+            <div class="header">
+                <h1>Neary - Meeting Point Finder</h1>
+                <input
+                    type="number"
+                    id="numUsers"
+                    placeholder="Number of addresses"
+                />
+                <button class="btn" onclick="generateInputs()">
+                    Generate Inputs
+                </button>
+            </div>
+            <div id="inputContainer"></div>
+            <button class="btn" onclick="showOnMap()">
+                Show on Map
+            </button>
+            <div id="mapid"></div>
+        </div>
         <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-        <script src="script.js"></script>
+        <script>
+            var map = L.map("mapid").setView([51.505, -0.09], 13);
+            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                attribution:
+                    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            }).addTo(map);
+
+            function generateInputs() {
+                var numUsers = document.getElementById("numUsers").value;
+                var inputContainer = document.getElementById("inputContainer");
+                inputContainer.innerHTML = "";
+                for (var i = 0; i < numUsers; i++) {
+                    var input = document.createElement("input");
+                    input.type = "text";
+                    input.placeholder = "Address " + (i + 1);
+                    input.id = "address" + i;
+                    inputContainer.appendChild(input);
+                }
+            }
+
+            function showOnMap() {
+                var numUsers = document.getElementById("numUsers").value;
+                var promises = [];
+
+                for (var i = 0; i < numUsers; i++) {
+                    var address = document.getElementById("address" + i).value;
+                    var url =
+                        "https://nominatim.openstreetmap.org/search?format=json&q=" +
+                        encodeURIComponent(address);
+                    promises.push(
+                        fetch(url).then((response) => response.json())
+                    );
+                }
+
+                Promise.all(promises)
+                    .then((results) => {
+                        var latSum = 0,
+                            lonSum = 0,
+                            validResults = 0;
+                        var userLocations = [];
+                        results.forEach((data) => {
+                            if (data.length > 0) {
+                                var lat = parseFloat(data[0].lat);
+                                var lon = parseFloat(data[0].lon);
+                                latSum += lat;
+                                lonSum += lon;
+                                validResults++;
+                                userLocations.push([lat, lon]);
+                                L.marker([lat, lon]).addTo(map);
+                            }
+                        });
+
+                        if (validResults > 0) {
+                            var avgLat = latSum / validResults;
+                            var avgLon = lonSum / validResults;
+
+                            // Reverse geocoding to find the nearest address
+                            fetch(
+                                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${avgLat}&lon=${avgLon}`
+                            )
+                                .then((response) => response.json())
+                                .then((data) => {
+                                    var nearestLat = parseFloat(data.lat);
+                                    var nearestLon = parseFloat(data.lon);
+
+                                    var centralIcon = L.icon({
+                                        iconUrl:
+                                            "https://leafletjs.com/examples/custom-icons/star.png",
+                                        iconSize: [38, 38],
+                                        iconAnchor: [19, 38],
+                                        popupAnchor: [0, -38],
+                                    });
+
+                                    L.marker([nearestLat, nearestLon], {
+                                        icon: centralIcon,
+                                    })
+                                        .addTo(map)
+                                        .bindPopup("Meeting Point")
+                                        .openPopup();
+                                    map.setView([nearestLat, nearestLon], 13);
+
+                                    userLocations.forEach((location) => {
+                                        L.polyline(
+                                            [
+                                                location,
+                                                [nearestLat, nearestLon],
+                                            ],
+                                            { color: "blue" }
+                                        ).addTo(map);
+                                    });
+                                })
+                                .catch((error) => {
+                                    console.log(
+                                        "Errore nella ricerca del punto centrale: " +
+                                            error
+                                    );
+                                });
+                        } else {
+                            console.log("Nessun indirizzo valido trovato");
+                        }
+                    })
+                    .catch((error) => {
+                        console.log("Errore: " + error);
+                    });
+            }
+        </script>
     </body>
 </html>

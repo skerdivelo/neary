@@ -59,7 +59,7 @@ function showOnMap() {
 
                 L.marker([avgLat, avgLon], { icon: centralIcon })
                     .addTo(map)
-                    .bindPopup("Punto di incontro")
+                    .bindPopup("Meeting Point")
                     .openPopup();
                 map.setView([avgLat, avgLon], 13);
 
