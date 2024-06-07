@@ -1,4 +1,4 @@
-#Neary - Meeting Point Finder
+## Neary - Meeting Point Finder
 
 This project is a web application that helps multiple users find a convenient meeting point based on their input addresses. Using the OpenStreetMap and Leaflet.js libraries, the application geocodes user addresses, calculates a central meeting point, and displays it on a map. Additionally, it draws lines from each user's address to the central meeting point, ensuring it is located on a street or other suitable location.
 
