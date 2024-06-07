@@ -90,6 +90,16 @@
                 height: 600px;
                 border: 1px solid #ccc;
                 border-radius: 8px;
+                margin-top: 20px;
+            }
+
+            #meetingPointAddress {
+                width: 100%;
+                padding: 10px;
+                margin-top: 20px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                font-size: 16px;
             }
 
             @media (max-width: 768px) {
@@ -120,6 +130,12 @@
             <button class="btn" onclick="showOnMap()">
                 Show on Map
             </button>
+            <input
+                type="text"
+                id="meetingPointAddress"
+                readonly
+                placeholder="Meeting Point Address"
+            />
             <div id="mapid"></div>
         </div>
         <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -137,7 +153,7 @@
                 for (var i = 0; i < numUsers; i++) {
                     var input = document.createElement("input");
                     input.type = "text";
-                    input.placeholder = "Address " + (i + 1);
+                    input.placeholder = "Indirizzo " + (i + 1);
                     input.id = "address" + i;
                     inputContainer.appendChild(input);
                 }
@@ -187,10 +203,10 @@
                                 .then((data) => {
                                     var nearestLat = parseFloat(data.lat);
                                     var nearestLon = parseFloat(data.lon);
+                                    var displayAddress = data.display_name;
 
                                     var centralIcon = L.icon({
-                                        iconUrl:
-                                            "https://leafletjs.com/examples/custom-icons/star.png",
+                                        iconUrl: "centralIcon.png",
                                         iconSize: [38, 38],
                                         iconAnchor: [19, 38],
                                         popupAnchor: [0, -38],
@@ -200,7 +216,7 @@
                                         icon: centralIcon,
                                     })
                                         .addTo(map)
-                                        .bindPopup("Meeting Point")
+                                        .bindPopup("Meeting Point: " + displayAddress)
                                         .openPopup();
                                     map.setView([nearestLat, nearestLon], 13);
 
@@ -213,19 +229,23 @@
                                             { color: "blue" }
                                         ).addTo(map);
                                     });
+
+                                    document.getElementById(
+                                        "meetingPointAddress"
+                                    ).value = displayAddress;
                                 })
                                 .catch((error) => {
-                                    console.log(
-                                        "Errore nella ricerca del punto centrale: " +
+                                    alert(
+                                        "Error calculating the meeting point: " +
                                             error
                                     );
                                 });
                         } else {
-                            console.log("Nessun indirizzo valido trovato");
+                            alert("No valid results found.");
                         }
                     })
                     .catch((error) => {
-                        console.log("Errore: " + error);
+                        console.log("Error: " + error);
                     });
             }
         </script>
